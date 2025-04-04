@@ -1,0 +1,69 @@
+# Service für den Kafka Consumer
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-consumer-service
+  labels:
+    app: kafka-consumer
+spec:
+  ports:
+    - port: 80
+      targetPort: 9092
+  selector:
+    app: kafka-consumer
+
+---
+# Deployment für den Kafka Consumer
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-consumer
+  labels:
+    app: kafka-consumer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka-consumer
+  template:
+    metadata:
+      labels:
+        app: kafka-consumer
+    spec:
+      containers:
+      - name: kafka-consumer
+        image: leon494/kafka-consumer:v1.0.7 # Ersetze dies mit deinem Image-Tag
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 9092
+        env:
+            - name: BOOTSTRAP_SERVER
+              value: "kafka-service:9092" # Verweis auf den Kafka-Service
+            - name: TOPIC_NAME
+              value: "location" # Kafka-Topic, das konsumiert wird
+            - name: DB_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: db-env
+                  key: DB_USERNAME
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: DB_PASSWORD
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: db-env
+                  key: DB_NAME
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: db-env
+                  key: DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: db-env
+                  key: DB_PORT
+      restartPolicy: Always

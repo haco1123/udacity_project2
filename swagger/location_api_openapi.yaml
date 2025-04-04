@@ -1,0 +1,88 @@
+openapi: 3.0.4
+info:
+  description: API for handling person interactions
+  version: "1.0.0"
+  title: Person API
+paths:
+  /locations:
+    post:
+      summary: Adds a new person
+      operationId: addPerson
+      description: Creates a person.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Location_post'
+        description: Location that was created
+      responses:
+        '202':
+          description: Request accepted successfully
+  /locations/{location_id}:
+    get:
+      summary: Retrieves one location
+      operationId: getLocation
+      description: Retrieves exact one location by location id.
+      parameters:
+        - in: path
+          name: location_id # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: The location ID
+      responses:
+        '200':
+           description: One location
+           content:
+             application/json:
+               schema:
+                 $ref: '#/components/schemas/Location_get'
+components:
+  schemas:
+    Location_get:
+      type: object
+      required:
+        - id
+        - person_id
+        - longitude
+        - latitude
+        - creation_time
+      properties:
+        id:
+          type: integer
+          example: 1
+        person_id:
+          type: integer
+          example: 1
+        longitude:
+          type: string
+          example: '37.553441'
+        latitude:
+          type: string
+          example: '-122.290524'
+        creation_time:
+          type: string
+          format: date-time
+          example: '2020-08-15T10:37:06'
+    Location_post:
+      type: object
+      required:
+        - person_id
+        - longitude
+        - latitude
+        - creation_time
+      properties:
+        person_id:
+          type: integer
+          example: 1
+        longitude:
+          type: string
+          example: '37.553441'
+        latitude:
+          type: string
+          example: '-122.290524'
+        creation_time:
+          type: string
+          format: date-time
+          example: '2020-08-15T10:37:06'

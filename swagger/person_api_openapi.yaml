@@ -1,0 +1,178 @@
+openapi: 3.0.4
+info:
+  description: API for handling person interactions
+  version: "1.0.0"
+  title: Person API
+paths:
+  /persons:
+    get:
+      summary: Retrieves all persons
+      operationId: getPersons
+      description: Retrieves all the persons that have been created.
+      responses:
+        '200':
+          description: All persons
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Person_get'
+    post:
+      summary: Adds a new person
+      operationId: addPerson
+      description: Creates a person.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Person_post'
+        description: Person that was created
+      responses:
+        '200':
+          description: Person created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person_get'
+        '400':
+          description: 'Invalid input, object invalid'
+  /persons/{person_id}:
+    get:
+      summary: Retrieves one person
+      operationId: getPerson
+      description: Retrieves exact one person by person id.
+      parameters:
+        - in: path
+          name: person_id # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: The person ID
+      responses:
+        '200':
+          description: One person
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Person_get'
+  /persons/{person_id}/connection:
+    get:
+      summary: Retrieves all connections of the given person
+      operationId: getConnections
+      description: Retrieves all connections of one person by person id.
+      parameters:
+        - in: path
+          name: person_id # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+            example: 1
+          description: The person ID
+        - in: query
+          name: start_date
+          required: true
+          schema:
+            type: string
+            format: date
+            example: "2020-01-01"
+          description: Start date for date range
+        - in: query
+          name: end_date
+          required: true
+          schema:
+            type: string
+            format: date
+            example: "2020-12-30"
+          description: End date for date range
+        - in: query
+          name: distance # Note the name is the same as in the path
+          schema:
+            type: integer
+            example: 5
+          description: Distance between the given person and all persons meet in the range of start and end date
+      responses:
+        '200':
+          description: One person
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Connection'
+components:
+  schemas:
+    Person_get:
+      type: object
+      required:
+        - id
+        - first_name
+        - last_name
+        - company_name
+      properties:
+        id:
+          type: integer
+          example: 1
+        first_name:
+          type: string
+          example: 'First name'
+        last_name:
+          type: string
+          example: 'Last name'
+        company_name:
+          type: string
+          example: 'Company'
+    Person_post:
+      type: object
+      required:
+        - first_name
+        - last_name
+        - company_name
+      properties:
+        first_name:
+          type: string
+          example: 'First name'
+        last_name:
+          type: string
+          example: 'Last name'
+        company_name:
+          type: string
+          example: 'Company'
+    Connection:
+      type: object
+      required:
+        - location
+        - person
+      properties:
+        location:
+          $ref: '#/components/schemas/Location'
+        person:
+          $ref: '#/components/schemas/Person_get'
+    Location:
+      type: object
+      required:
+        - id
+        - person_id
+        - longitude
+        - latitude
+        - creation_time
+      properties:
+        id:
+          type: integer
+          example: 1
+        person_id:
+          type: integer
+          example: 1
+        longitude:
+          type: string
+          example: '37.553441'
+        latitude:
+          type: string
+          example: '-122.290524'
+        creation_time:
+          type: string
+          format: date-time
+          example: '2020-08-15T10:37:06'
